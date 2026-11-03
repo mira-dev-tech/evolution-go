@@ -403,6 +403,13 @@ func (w whatsmeowService) StartClient(cd *ClientData) {
 		}
 	}
 
+	// DeviceProps só vai no pareamento; o login usa a versão global do whatsmeow.
+	// Sem isto o cliente continua na versão compilada e a Meta recusa com
+	// "Client outdated (405)" quando ela expira, mesmo com a versão da web lida.
+	if version.Major != 0 && version.Minor != 0 && version.Patch != 0 {
+		store.SetWAVersion(store.WAVersionContainer{uint32(version.Major), uint32(version.Minor), uint32(version.Patch)})
+	}
+
 	// 🔒 FIX: Sempre criar logger, mesmo que WaDebug esteja vazio
 	// Usar "INFO" como nível mínimo para garantir que logs importantes apareçam
 	minLevel := w.config.WaDebug
